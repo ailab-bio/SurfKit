@@ -1,0 +1,38 @@
+Bootstrap: docker
+From: nvidia/cuda:12.2.0-devel-ubuntu22.04
+
+%post
+
+    apt-get update
+    apt-get install -y \
+        build-essential \
+        cmake \
+        git \
+        wget \
+        libfftw3-dev \
+        libhwloc-dev
+
+
+    cd /opt
+    wget https://ftp.gromacs.org/gromacs/gromacs-2024.tar.gz
+    tar -xzf gromacs-2024.tar.gz
+    cd gromacs-2024
+
+    mkdir build
+    cd build
+
+    cmake .. \
+        -DGMX_BUILD_OWN_FFTW=ON \
+        -DGMX_GPU=CUDA \
+        -DGMX_MPI=OFF \
+        -DGMX_OPENMP=ON \
+        -DCMAKE_INSTALL_PREFIX=/opt/gromacs
+
+    make -j$(nproc)
+    make install
+
+%environment
+    export PATH=/opt/gromacs/bin:$PATH
+
+%runscript
+    exec gmx "$@"
