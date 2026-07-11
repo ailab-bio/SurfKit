@@ -1,0 +1,28 @@
+Bootstrap: docker
+From: continuumio/miniconda3:latest
+
+%labels
+    Description SurfKit surrogate model environment
+    Packages    rdkit xgboost optuna scikit-learn shap matplotlib seaborn
+
+%post
+    conda install -y -c conda-forge \
+        python=3.11 \
+        rdkit \
+        xgboost=2.1 \
+        optuna=4 \
+        scikit-learn \
+        numpy \
+        pandas \
+        scipy \
+        matplotlib \
+        seaborn \
+        shap \
+        joblib && \
+    conda clean -afy
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+
+%runscript
+    exec python "$@"
